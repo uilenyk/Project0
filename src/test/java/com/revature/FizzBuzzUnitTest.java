@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.revature.FizzBuzzTest;
+
 /**
  * Unit testing is the process of writing a test that tests the behavior of the code on the most
  * granular level. Generally, this means testing individual methods, by providing input values and 
