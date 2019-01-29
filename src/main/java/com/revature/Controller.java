@@ -3,13 +3,13 @@ package com.revature;
 public class Controller {
 	private WelcomeMenu wm;
 	private MainMenu mm;
-	//private AccountMenu am;
+	private AccountMenu am;
 	//private PersonalMenu pm;
 	
 	public Controller() {
 		wm = new WelcomeMenu();
 		mm = new MainMenu();
-		//am = new AccountMenu();
+		am = new AccountMenu();
 		//pm = new PersonalMenu();
 	}
 	
@@ -25,7 +25,7 @@ public class Controller {
 				run = mm.show();
 				break;
 			case "account":
-				//run = am.show()
+				run = am.show();
 				break;
 			case "personal":
 				//run = pm.show();
