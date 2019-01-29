@@ -1,5 +1,5 @@
 package com.revature;
 
 public interface Showable {
-	public void show();
+	public String show();
 }

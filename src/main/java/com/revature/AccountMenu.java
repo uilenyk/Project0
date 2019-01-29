@@ -1,9 +1,10 @@
 package com.revature;
 
 public class AccountMenu implements Showable{
-	public void show() {
+	public String show() {
 		System.out.print("Enter the account number of the account you want to access or enter"
 				+ " 0 to create a new account: ");
+		return "";
 	}
 	
 	private int getInput() {
