@@ -34,7 +34,7 @@ public class AccountMenu implements Showable {
 				System.out.println("9)\tExit");
 				System.out.print("What would you like to do: ");
 				choice = input(accounts);
-				log.info("chosen option currently is "+choice);
+				log.info("chosen option currently is " + choice);
 			}
 
 			switch (choice) {
@@ -130,9 +130,9 @@ public class AccountMenu implements Showable {
 		return id;
 	}
 
-	
 	/*
-	 * Private class that helps display account details and actually makes changes to existing accounts in the database
+	 * Private class that helps display account details and actually makes changes
+	 * to existing accounts in the database
 	 */
 	private class Account implements Showable {
 		private int id;
@@ -148,8 +148,56 @@ public class AccountMenu implements Showable {
 
 		@Override
 		public String show() {
-			System.out.print("Account #: "+this.getId()+"\tAccount Balance: "+this.getBalance()+"\tAccount Type: "+this.getType());
-			return null;
+			String result = "current";
+			do {
+				int choice = -1;
+				while (choice == -1) {
+					System.out.print("Account #: " + this.getId() + "\tAccount Balance: " + this.getBalance()
+							+ "\tAccount Type: " + this.getType());
+					System.out.println(
+							"0)\tTransfer money to another account(you must know the account number of the account you wish to "
+									+ "transfer money to)");
+					System.out.println("1)\tMake a widthdraw.");
+					System.out.println("2)\tMake a deposit");
+					System.out.println("3)\tClose this account. (The balance must be 0 for the account to be closed");
+					System.out.println("4)\tGo back to the accounts menu.");
+					System.out.println("5)\tGo back to the main menu.");
+					System.out.println("6)\tLogout");
+					System.out.println("9)\tExit");
+					System.out.print("What would you like to do: ");
+					choice = input();
+				}
+
+				switch (choice) {
+				case 0:
+					transferBalance();
+					break;
+				case 1:
+					widthdrawMoney();
+					break;
+				case 2:
+					depositMoney();
+					break;
+				case 3:
+					closeAccount();
+					break;
+				case 4:
+					return "account";
+				case 5:
+					return "main";
+				case 6:
+					return "welcome";
+				case 9:
+					return "exit";
+				default:
+					log.error(
+							"In specific account, chosen option was not 0, 1, 2, 3, 4, 5, 6, or 9 and got to case switch");
+					System.out.println("Sorry, something went wrong. Please try again.");
+					result = "current";
+				}
+			} while (result == "current");
+			log.error("Somehow got out of the do while loop without return the account menu");
+			return "account";
 		}
 
 		public int getId() {
@@ -168,7 +216,30 @@ public class AccountMenu implements Showable {
 			return balance;
 		}
 
-		private synchronized void transferBalance(double add, int to_id) {
+		private int input() {
+			Scanner s = new Scanner(System.in);
+			int result;
+			try {
+				result = s.nextInt();
+			} catch (InputMismatchException e) {
+				System.out.println("\nThat is not a valid selection. Please enter a number.\n");
+				s.nextLine();
+				return -1;
+			}
+			if (result != 0 && result != 1 && result != 2 && result != 3 && result != 4 && result != 9) {
+				System.out.println("\nThat is not a valid selection. Please choose from the given menu.\n");
+				s.nextLine();
+				return -1;
+			}
+			// flushes anything extra still in the buffer.
+			s.nextLine();
+			return result;
+		}
+
+		private synchronized void transferBalance() {
+			// double add, int to_id should be scanned in here and checked
+			// also needs a way to go back to the accounts menu
+			int add = 0;
 			if (add > balance) {
 				System.out.println("The selected account does not have the funds to send that amount.");
 				return;
@@ -177,5 +248,16 @@ public class AccountMenu implements Showable {
 			this.balance -= add;
 		}
 
+		private void closeAccount() {
+
+		}
+
+		private void widthdrawMoney() {
+
+		}
+
+		private void depositMoney() {
+
+		}
 	}
 }
