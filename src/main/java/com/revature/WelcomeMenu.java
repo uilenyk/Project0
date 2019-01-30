@@ -15,6 +15,12 @@ public class WelcomeMenu implements Showable {
 	static Logger log = Logger.getRootLogger();
 	private static final Set<String> badpass = new HashSet<>();
 	
+	private Controller controller;
+	
+	public WelcomeMenu(Controller c) {
+		controller = c;
+	}
+	
 	/*
 	 * sets up the set that holds common passwords to prevent people from setting their password to something that is too common
 	 */
@@ -96,6 +102,7 @@ public class WelcomeMenu implements Showable {
 			return "exit";
 		}
 		//successful authentication and brings user to the main menu
+		controller.setUser(user);
 		return "main";
 	}
 
@@ -120,7 +127,7 @@ public class WelcomeMenu implements Showable {
 			return false;
 		if(!validEmail(user)) return false;
 		//TO DO: go to data base and check hash
-		if(user.equals("user@gmail.com") && pass.equals("password")) return true;
+		if(user.equals("uilenyk@gmail.com") && pass.equals("password")) return true;
 		else return false;
 	}
 	

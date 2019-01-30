@@ -8,13 +8,15 @@ public class Controller {
 	private WelcomeMenu wm;
 	private MainMenu mm;
 	private AccountMenu am;
-	//private PersonalMenu pm;
+	private PersonalMenu pm;
+	
+	private String currentUser;
 	
 	public Controller() {
-		wm = new WelcomeMenu();
-		mm = new MainMenu();
-		am = new AccountMenu();
-		//pm = new PersonalMenu();
+		wm = new WelcomeMenu(this);
+		mm = new MainMenu(this);
+		am = new AccountMenu(this);
+		pm = new PersonalMenu(this);
 	}
 	
 	public void run() {
@@ -33,10 +35,18 @@ public class Controller {
 				log.info("run in controller = "+run);
 				break;
 			case "personal":
-				//run = pm.show();
+				run = pm.show();
 				break;
 			}
 		}
 		System.out.println("Thank you for using our Banking app. Have a nice day.");
+	}
+	
+	public String getUser() {
+		return currentUser;
+	}
+	
+	public void setUser(String u) {
+		currentUser = u;
 	}
 }

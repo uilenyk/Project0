@@ -12,6 +12,12 @@ import org.apache.log4j.Logger;
 
 public class AccountMenu implements Showable {
 	static Logger log = Logger.getRootLogger();
+	
+	private Controller controller;
+	
+	public AccountMenu(Controller c) {
+		controller = c;
+	}
 
 	public String show() {
 		String result = "account";
@@ -77,7 +83,7 @@ public class AccountMenu implements Showable {
 		try {
 			result = s.nextInt();
 		} catch (InputMismatchException e) {
-			System.out.println("\nThat is not a valid selection.\n");
+			System.out.println("\nThat is not a valid selection. Please enter a number.\n");
 			s.nextLine();
 			return -1;
 		}
@@ -88,7 +94,7 @@ public class AccountMenu implements Showable {
 		}
 		if (result != 0 && result != 1 && result != 2 && result != 9) {
 			if (!id.isEmpty() && !id.contains(result)) {
-				System.out.println("\nThat is not a valid selection.\n");
+				System.out.println("\nThat is not a valid selection. Please choose from the menu provided.\n");
 				s.nextLine();
 				return -1;
 			}
@@ -106,6 +112,7 @@ public class AccountMenu implements Showable {
 	private List<Account> listAccounts() {
 		List<Account> accounts = new ArrayList<>();
 		// TODO: get account id list that belong to current user
+		String email = controller.getUser();
 		List<Integer> id = new ArrayList<>();
 		id.add(10);
 		id.add(12);

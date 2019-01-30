@@ -8,6 +8,12 @@ import org.apache.log4j.Logger;
 public final class MainMenu implements Showable{
 	static Logger log = Logger.getRootLogger();
 	
+	private Controller controller;
+	
+	public MainMenu(Controller c) {
+		controller = c;
+	}
+	
 	public String show() {
 		int choice = -1;
 		while(choice == -1) {
@@ -57,5 +63,5 @@ public final class MainMenu implements Showable{
 		s.nextLine();
 		return result;
 	}
-	
+
 }
