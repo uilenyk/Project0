@@ -31,7 +31,7 @@ public class AccountMenu implements Showable {
 				}
 				System.out.println("0)\tCreate a new account");
 				System.out.println("1)\tBack to main menu");
-				System.out.println("2)\tLogout of your account");
+				System.out.println("2)\tLogout");
 				System.out.println("9)\tExit");
 				System.out.print("What would you like to do: ");
 				choice = input(accounts);
@@ -130,6 +130,7 @@ public class AccountMenu implements Showable {
 	private int createAccount() {
 		int id = 0;
 		// TODO: got to database and add account
+		//dont forget to add the number of people on the account
 		return id;
 	}
 
@@ -141,6 +142,7 @@ public class AccountMenu implements Showable {
 		private int id;
 		private String type;
 		private BigDecimal balance;
+		//in the data table, be sure the keep track of the number of people who are on the account and manually delete accounts.
 
 		public Account(int id, String type, BigDecimal balance) {
 			super();

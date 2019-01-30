@@ -134,6 +134,7 @@ public class WelcomeMenu implements Showable {
 	 * -last name
 	 * -phone number
 	 * -date of birth
+	 * -mailing address
 	 */
 	private String createAccount() {
 		Scanner s = new Scanner(System.in);
