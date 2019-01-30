@@ -1,6 +1,10 @@
 package com.revature;
 
+import org.apache.log4j.Logger;
+
 public class Controller {
+	static Logger log = Logger.getRootLogger();
+	
 	private WelcomeMenu wm;
 	private MainMenu mm;
 	private AccountMenu am;
@@ -26,6 +30,7 @@ public class Controller {
 				break;
 			case "account":
 				run = am.show();
+				log.info("run in controller = "+run);
 				break;
 			case "personal":
 				//run = pm.show();

@@ -6,11 +6,11 @@ public class ExecuteProgram {
 		 * Controller program = new Controller();
 		 * program.run();
 		 */
-		WelcomeMenu m = new WelcomeMenu();
+		//WelcomeMenu m = new WelcomeMenu();
 		//m.show();
 		//MainMenu mm = new MainMenu();
 		//mm.show();
-		//AccountMenu am = new AccountMenu();
-		//am.show();
+		AccountMenu am = new AccountMenu();
+		am.show();
 	}
 }
