@@ -30,6 +30,7 @@ public final class MainMenu implements Showable{
 			return "exit";
 		default:
 			log.error("In main menu, chosen option was not 0, 1, or 2 but got to case switch");
+			System.out.println("Sorry something went wrong. Please try again.");
 			return "main";
 		}
 	}

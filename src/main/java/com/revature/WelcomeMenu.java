@@ -1,12 +1,37 @@
 package com.revature;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
 public class WelcomeMenu implements Showable {
 	static Logger log = Logger.getRootLogger();
+	private static final Set<String> badpass = new HashSet<>();
+	
+	/*
+	 * sets up the set that holds common passwords to prevent people from setting their password to something that is too common
+	 */
+	public WelcomeMenu() {
+		if (badpass.isEmpty()) {
+			try(BufferedReader br = new BufferedReader(new FileReader(new File("./src/main/resources/badpassword.txt")))) {
+				String line;
+				while((line = br.readLine()) != null) {
+					log.info("The bad password that was just read: "+line);
+					badpass.add(line);
+				}
+				
+			} catch (IOException e) {
+				log.error(e.toString());
+			}
+		}
+	}
 	
 	/*
 	 * Runs the welcome menu and returns the next destination back to the controller class as a string
@@ -102,12 +127,20 @@ public class WelcomeMenu implements Showable {
 	/*
 	 * creates leads the user through account creation and pushes data to the db. Then automatically logs the new user in
 	 * and brings them to the main menu.
+	 * fields:
+	 * -user(email)
+	 * -password
+	 * -first name
+	 * -last name
+	 * -phone number
+	 * -date of birth
 	 */
 	private String createAccount() {
 		Scanner s = new Scanner(System.in);
 		String user = "";
 		String pass = "";
 		pass = passwordHash(pass);
+		//checks for a valid email patter to be entered
 		while (user.length() > 64 || !validEmail(user)) {
 			System.out.print("That is not a valid email address.\nPlease enter your email: ");
 			user = s.nextLine();
@@ -115,6 +148,9 @@ public class WelcomeMenu implements Showable {
 		return "main";
 	}
 	
+	/*
+	 * Password hashing method
+	 */
 	private String passwordHash(String pass) {
 		return "";
 	}

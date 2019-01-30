@@ -7,8 +7,10 @@ public class ExecuteProgram {
 		 * program.run();
 		 */
 		WelcomeMenu m = new WelcomeMenu();
-		m.show();
+		//m.show();
 		//MainMenu mm = new MainMenu();
 		//mm.show();
+		//AccountMenu am = new AccountMenu();
+		//am.show();
 	}
 }
