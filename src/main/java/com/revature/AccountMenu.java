@@ -53,9 +53,11 @@ public class AccountMenu implements Showable {
 				result = "main";
 				break;
 			case 2:
+				controller.setUser(null);
 				result = "welcome";
 				break;
 			case 9:
+				controller.setUser(null);
 				result = "exit";
 				break;
 			default:

@@ -17,9 +17,9 @@ public final class MainMenu implements Showable{
 	public String show() {
 		int choice = -1;
 		while(choice == -1) {
-			System.out.println("0)\tLogout");
-			System.out.println("1)\tAccounts");
-			System.out.println("2)\tPersonal Information");
+			System.out.println("0)\tAccounts");
+			System.out.println("1)\tPersonal Information");
+			System.out.println("2)\tLogout");
 			System.out.println("9)\tExit");
 			System.out.print("Select from the menu above by entering the corrisponding number: ");
 			choice = input();
@@ -27,15 +27,17 @@ public final class MainMenu implements Showable{
 		log.info("input function returned "+choice);
 		switch (choice){
 		case 0:
-			return "welcome";
-		case 1:
 			return "account";
-		case 2:
+		case 1:
 			return "personal";
+		case 2:
+			controller.setUser(null);
+			return "welcome";
 		case 9:
+			controller.setUser(null);
 			return "exit";
 		default:
-			log.error("In main menu, chosen option was not 0, 1, or 2 but got to case switch");
+			log.error("In main menu, chosen option was not 0, 1, 2, or 9 but got to case switch");
 			System.out.println("Sorry something went wrong. Please try again.");
 			return "main";
 		}

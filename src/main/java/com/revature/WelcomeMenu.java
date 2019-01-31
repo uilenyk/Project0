@@ -82,7 +82,7 @@ public class WelcomeMenu implements Showable {
 		int attempts = 1;
 		System.out.print("Please enter your email: ");
 		String user = s.nextLine();
-		System.out.print("Please enter your password");
+		System.out.print("Please enter your password: ");
 		String pass = s.nextLine();
 		log.info("user currently = " + user + "and pass = "+pass);
 		//tries to authenticate the user giving them 5 attempts
