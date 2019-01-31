@@ -31,8 +31,8 @@ public class PersonalMenu implements Showable {
 			int choice = -1;
 			while (choice == -1) {
 				System.out.println("Your personal info:");
-				System.out.println("Name: " + name + "\tEmail: " + email + "\nMailing Address: " + address
-						+ "\nPhone Number: " + phone + "\tBirthday: " + birthday);
+				System.out.println("Name: " + name + "\t|\tEmail: " + email + "\nMailing Address: " + address
+						+ "\nPhone Number: " + phone + "\t|\tBirthday: " + birthday);
 				System.out.println("0)\tEdit mailing address.");
 				System.out.println("1)\tEdit phone number.");
 				System.out.println("2)\tBack to main menu.");
@@ -74,7 +74,7 @@ public class PersonalMenu implements Showable {
 		System.out.print("What is your new phone number? (please enter the number without dashes or parentheses) ");
 		String number;
 		while((number = checkPhoneInput()) == "false") {
-			System.out.println("You have entered too many numbers for a US phone number.");
+			System.out.println("That is not a valid US phone number.");
 			System.out.print("What is your new phone number? (please enter the number without dashes or parentheses) ");
 		}
 		//TODO: change in psql
@@ -82,6 +82,7 @@ public class PersonalMenu implements Showable {
 		System.out.println("Your phone number has been successfully updated");
 	}
 	
+	//Makes sure the new phone number input is a possible valid number
 	private String checkPhoneInput() {
 		Scanner s = new Scanner(System.in);
 		String number = s.next();

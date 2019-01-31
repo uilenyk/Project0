@@ -21,7 +21,7 @@ public final class MainMenu implements Showable{
 			System.out.println("1)\tPersonal Information");
 			System.out.println("2)\tLogout");
 			System.out.println("9)\tExit");
-			System.out.print("Select from the menu above by entering the corrisponding number: ");
+			System.out.print("What do you want to do: ");
 			choice = input();
 		}
 		log.info("input function returned "+choice);
