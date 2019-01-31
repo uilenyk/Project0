@@ -16,10 +16,6 @@ public class ExecuteProgram {
 		//mm.show();
 		//AccountMenu am = new AccountMenu();
 		//am.show();
-		SecureRandom sr = new SecureRandom();
 		//int salt = sr.nextint()
-		String salt = BCrypt.gensalt(12);
-		String hash = BCrypt.hashpw("password", salt);
-		System.out.println(hash);
 	}
 }

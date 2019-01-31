@@ -153,12 +153,28 @@ public class WelcomeMenu implements Showable {
 	private String createAccount() {
 		Scanner s = new Scanner(System.in);
 		String user = newEmail();
+		//if user enters a email that is already in the db, the program will return user to the welcome menu
 		if (user.equalsIgnoreCase("login")) {
 			return "welcome";
 		}
 		String pass = newPassword();
 		String salt = BCrypt.gensalt(12);
 		String hash = BCrypt.hashpw(pass, salt);
+		System.out.print("Please enter your first name: ");
+		String firstName = s.next();
+		s.nextLine();
+		System.out.print("Please enter your last name: ");
+		String lastName = s.next();
+		s.nextLine();
+		System.out.print("Please enter your mailing address: ");
+		String address = s.nextLine();
+		System.out.print("Please enter your phone number (please enter the number without dashes or parentheses): ");
+		String number;
+		while((number = checkPhoneInput()) == "false") {
+			System.out.println("That is not a valid US phone number.");
+			System.out.print("Pleae enter your phone number (please enter the number without dashes or parentheses): ");
+		}
+		
 		// TODO: create new row and save all data to db
 		// checks for a valid email patter to be entered
 		while (user.length() > 64 || !validEmail(user)) {
@@ -167,6 +183,17 @@ public class WelcomeMenu implements Showable {
 		}
 		controller.setUser(user);
 		return "main";
+	}
+	
+	private String checkPhoneInput() {
+		Scanner s = new Scanner(System.in);
+		String number = s.next();
+		s.nextLine();
+		if(number.matches("[0-9]+") && number.length() == 10) {
+			return number;
+		} else {
+			return "false";
+		}
 	}
 
 	private String newPassword() {
