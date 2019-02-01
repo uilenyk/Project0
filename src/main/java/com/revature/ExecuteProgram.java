@@ -1,10 +1,10 @@
 package com.revature;
 
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
-import org.mindrot.jbcrypt.BCrypt;
+import com.revature.dao.QueryStatement;
 
 public class ExecuteProgram {
 	public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -17,5 +17,10 @@ public class ExecuteProgram {
 		//AccountMenu am = new AccountMenu();
 		//am.show();
 		//int salt = sr.nextint()
+		//String salt = BCrypt.gensalt(12);
+		//String hash = BCrypt.hashpw("password", salt);
+		//QueryStatement.insertUser("user@gmail.com", hash, salt, "8583817405", "Kyne", "Liu", "address", new Date(2, 5, 1992));
+		
+		QueryStatement.insertAccount(new BigDecimal("100.50"), "checkings", 1, "user@gmail.com");
 	}
 }

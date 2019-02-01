@@ -88,6 +88,7 @@ public class WelcomeMenu implements Showable {
 		int attempts = 1;
 		System.out.print("Please enter your email: ");
 		String user = s.nextLine();
+		user = user.trim();
 		System.out.print("Please enter your password: ");
 		String pass = s.nextLine();
 		log.info("user currently = " + user + "and pass = " + pass);
@@ -161,11 +162,11 @@ public class WelcomeMenu implements Showable {
 		String salt = BCrypt.gensalt(12);
 		String hash = BCrypt.hashpw(pass, salt);
 		System.out.print("Please enter your first name: ");
-		String firstName = s.next();
-		s.nextLine();
+		String firstName = s.nextLine();
+		//s.nextLine();
 		System.out.print("Please enter your last name: ");
-		String lastName = s.next();
-		s.nextLine();
+		String lastName = s.nextLine();
+		//s.nextLine();
 		System.out.print("Please enter your mailing address: ");
 		String address = s.nextLine();
 		System.out.print("Please enter your phone number (please enter the number without dashes or parentheses): ");
@@ -207,6 +208,7 @@ public class WelcomeMenu implements Showable {
 			do {
 				System.out.print("Please enter your password: ");
 				pass = s.nextLine();
+				pass = pass.trim();
 			} while (!validPass(pass));
 			System.out.print("Please retype your password: ");
 			String passMatch = s.nextLine();

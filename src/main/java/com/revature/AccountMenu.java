@@ -86,8 +86,9 @@ public class AccountMenu implements Showable {
 			result = s.nextInt();
 		} catch (InputMismatchException e) {
 			System.out.println("\nThat is not a valid selection. Please enter a number.\n");
-			s.nextLine();
 			return -1;
+		} finally {
+			s.nextLine();
 		}
 		Set<Integer> id = new HashSet<>();
 		if (!account.isEmpty()) {
@@ -97,12 +98,9 @@ public class AccountMenu implements Showable {
 		if (result != 0 && result != 1 && result != 2 && result != 9) {
 			if (!id.isEmpty() && !id.contains(result)) {
 				System.out.println("\nThat is not a valid selection. Please choose from the menu provided.\n");
-				s.nextLine();
 				return -1;
 			}
 		}
-		// flushes anything extra still in the buffer.
-		s.nextLine();
 		return result;
 	}
 	/*
@@ -129,7 +127,7 @@ public class AccountMenu implements Showable {
 		// TODO go to psql and get account from id
 		String tempType = "checkings";
 		BigDecimal tempBalance = new BigDecimal("100.00");
-		Account result = new Account(id, tempType, tempBalance);
+		Account result = new Account(id, tempType, tempBalance, this.controller);
 		return result;
 	}
 
@@ -151,13 +149,16 @@ public class AccountMenu implements Showable {
 		private int id;
 		private String type;
 		private BigDecimal balance;
+		
+		private Controller controller;
 		//in the data table, be sure the keep track of the number of people who are on the account and manually delete accounts.
 
-		public Account(int id, String type, BigDecimal balance) {
+		public Account(int id, String type, BigDecimal balance, Controller c) {
 			super();
 			this.id = id;
 			this.type = type;
 			this.balance = balance;
+			controller = c;
 		}
 
 		@Override

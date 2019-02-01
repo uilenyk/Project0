@@ -53,16 +53,14 @@ public final class MainMenu implements Showable{
 			result = s.nextInt();
 		} catch (InputMismatchException e) {
 			System.out.println("\nThat is not a valid selection.");
-			s.nextLine();
 			return -1;
+		} finally {
+			s.nextLine();
 		}
 		if(result != 0 && result != 1 && result != 2 && result != 9) {
 			System.out.println("\nThat is not a valid selection.");
-			s.nextLine();
 			return -1;
 		}
-		//flushes anything extra still in the buffer.
-		s.nextLine();
 		return result;
 	}
 
