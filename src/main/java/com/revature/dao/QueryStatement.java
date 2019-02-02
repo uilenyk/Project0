@@ -7,6 +7,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QueryStatement {
 
@@ -36,10 +38,11 @@ public class QueryStatement {
 		return true;
 	}
 	
-	public static boolean insertAccount(BigDecimal balance, String account_type, int account_members, String user) {
+	public static int insertAccount(BigDecimal balance, String account_type, int account_members, String user) {
 		System.out.println("url = "+System.getenv("psql_url"));
 		System.out.println("role = "+System.getenv("psql_role"));
 		System.out.println("pass = "+System.getenv("psql_pass"));
+		int account_id = 0;
 		try(Connection conn = DriverManager.getConnection(System.getenv("psql_url"), System.getenv("psql_role"), System.getenv("psql_pass"))) {
 			String query = "INSERT INTO accounts(balance, account_type, account_members) VALUES (?, ?, ?) RETURNING id;";
 			
@@ -50,7 +53,6 @@ public class QueryStatement {
 			statement.setInt(3, account_members);
 			
 			ResultSet rs = statement.executeQuery();
-			int account_id = 0;
 			if(rs.next()) {
 				account_id = rs.getInt("id");
 			}
@@ -65,8 +67,92 @@ public class QueryStatement {
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return account_id;
+		}
+		return account_id;
+	}
+	
+	public static boolean userExists(String user) {
+		try (Connection conn = DriverManager.getConnection(System.getenv("psql_url"), System.getenv("psql_role"), System.getenv("psql_pass"))){
+			String query = "SELECT email FROM users WHERE email = ?;";
+			
+			PreparedStatement statement = conn.prepareStatement(query);
+			
+			statement.setString(1, user);
+			
+			ResultSet rs = statement.executeQuery();
+			
+			if(rs.next()) {
+				System.out.println("user = "+rs.getString("email"));
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 			return false;
 		}
-		return true;
+		return false;
+	}
+	
+	public static List<ResultSet> getAccounts(String user) {
+		try(Connection conn = DriverManager.getConnection(System.getenv("psql_url"), System.getenv("psql_role"), System.getenv("psql_pass"))){
+			String query = "SELECT account FROM user_accounts WHERE user_id = ?;";
+			
+			PreparedStatement statement = conn.prepareStatement(query);
+			
+			statement.setString(1, user);
+			
+			ResultSet rs = statement.executeQuery();
+			List<ResultSet> account = new ArrayList<>();
+			while(rs.next()) {
+				query = "SELECT * FROM accounts WHERE id = ?";
+				statement = conn.prepareStatement(query);
+				statement.setInt(1, rs.getInt("account"));
+				ResultSet result = statement.executeQuery();
+				account.add(result);
+			}
+			return account;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return new ArrayList<ResultSet>();
+	}
+	
+	public static ResultSet getHash(String user) {
+		try(Connection conn = DriverManager.getConnection(System.getenv("psql_url"), System.getenv("psql_role"), System.getenv("psql_pass"))){
+			String query = "SELECT passhash, salt FROM users WHERE email = ?";
+			
+			PreparedStatement statement = conn.prepareStatement(query);
+			
+			statement.setString(1, user);
+			ResultSet rs = statement.executeQuery();
+			return rs;
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static boolean deposit(int id, BigDecimal deposit) {
+		try (Connection conn = DriverManager.getConnection(System.getenv("psql_url"), System.getenv("psql_role"), System.getenv("psql_pass"))){
+			String query = "SELECT balance FROM accounts WHERE id = ?;";
+			PreparedStatement statement = conn.prepareStatement(query);
+			statement.setInt(1, id);
+			ResultSet rs = statement.executeQuery();
+			
+			rs.next();
+			BigDecimal newBalance = rs.getBigDecimal("balance");
+			newBalance = newBalance.add(deposit);
+			
+			query = "UPDATE accounts SET balance = ? WHERE id = ?;";
+			statement = conn.prepareStatement(query);
+			statement.setBigDecimal(1, newBalance);
+			statement.setInt(2, id);
+			statement.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Sorry, something went wrong.");
+			return false;
+		}
 	}
 }

@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -11,6 +13,8 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
+
+import com.revature.dao.QueryStatement;
 
 public class WelcomeMenu implements Showable {
 	static Logger log = Logger.getRootLogger();
@@ -135,11 +139,22 @@ public class WelcomeMenu implements Showable {
 		if (!validEmail(user))
 			return false;
 		// TO DO: go to data base to get salt and hashed password
-		String hash = BCrypt.hashpw("password", "salt");
-		String password = BCrypt.hashpw(pass, "salt");
+		String hash = null;
+		String salt = null;
+		ResultSet rs = QueryStatement.getHash(user);
+		try {
+			if (rs.next()) {
+				hash = rs.getString("passhash");
+				salt = rs.getString("salt");
+			}
+			else {
+				return false;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		String password = BCrypt.hashpw(pass, salt);
 		if (hash.equals(password))
-			return true;
-		if (user.equals("uilenyk@gmail.com") && pass.equals("password"))
 			return true;
 		else
 			return false;
@@ -154,7 +169,8 @@ public class WelcomeMenu implements Showable {
 	private String createAccount() {
 		Scanner s = new Scanner(System.in);
 		String user = newEmail();
-		//if user enters a email that is already in the db, the program will return user to the welcome menu
+		// if user enters a email that is already in the db, the program will return
+		// user to the welcome menu
 		if (user.equalsIgnoreCase("login")) {
 			return "welcome";
 		}
@@ -163,19 +179,19 @@ public class WelcomeMenu implements Showable {
 		String hash = BCrypt.hashpw(pass, salt);
 		System.out.print("Please enter your first name: ");
 		String firstName = s.nextLine();
-		//s.nextLine();
+		// s.nextLine();
 		System.out.print("Please enter your last name: ");
 		String lastName = s.nextLine();
-		//s.nextLine();
+		// s.nextLine();
 		System.out.print("Please enter your mailing address: ");
 		String address = s.nextLine();
 		System.out.print("Please enter your phone number (please enter the number without dashes or parentheses): ");
 		String number;
-		while((number = checkPhoneInput()) == "false") {
+		while ((number = checkPhoneInput()) == "false") {
 			System.out.println("That is not a valid US phone number.");
 			System.out.print("Pleae enter your phone number (please enter the number without dashes or parentheses): ");
 		}
-		
+
 		// TODO: create new row and save all data to db
 		// checks for a valid email patter to be entered
 		while (user.length() > 64 || !validEmail(user)) {
@@ -185,12 +201,12 @@ public class WelcomeMenu implements Showable {
 		controller.setUser(user);
 		return "main";
 	}
-	
+
 	private String checkPhoneInput() {
 		Scanner s = new Scanner(System.in);
 		String number = s.next();
 		s.nextLine();
-		if(number.matches("[0-9]+") && number.length() == 10) {
+		if (number.matches("[0-9]+") && number.length() == 10) {
 			return number;
 		} else {
 			return "false";
@@ -226,10 +242,11 @@ public class WelcomeMenu implements Showable {
 		String checkNumberRegex = ".*[0-9].*";
 		String checkLowerRegex = ".*[a-z].*";
 		String checkUpperRegex = ".*[A-Z].*";
-		if(badpass.contains(pass)) {
+		if (badpass.contains(pass)) {
 			System.out.println("This password is too common. Please try again.");
 			return false;
-		} else if ((!pass.matches(checkNumberRegex) || !pass.matches(checkLowerRegex) || !pass.matches(checkUpperRegex)) || pass.length() < 9) {
+		} else if ((!pass.matches(checkNumberRegex) || !pass.matches(checkLowerRegex) || !pass.matches(checkUpperRegex))
+				|| pass.length() < 9) {
 			System.out.println("This password does not meet the password requirements. Please try again.");
 			return false;
 		}

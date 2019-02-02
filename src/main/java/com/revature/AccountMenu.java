@@ -1,35 +1,42 @@
 package com.revature;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.revature.dao.QueryStatement;
+
 public class AccountMenu implements Showable {
 	static Logger log = Logger.getRootLogger();
-	
+
 	private Controller controller;
-	
+
+	private Map<Integer, Account> accounts = new HashMap<>();
+
 	public AccountMenu(Controller c) {
 		controller = c;
 	}
 
 	public String show() {
 		String result = "account";
+		listAccounts();
 		do {
-			List<Account> accounts = listAccounts();
 			int choice = -1;
 			while (choice == -1) {
 				if (accounts.isEmpty()) {
 					System.out.println("You currently have no open accounts.");
 				} else {
 					System.out.println("Accounts #\t|\tBalance");
-					for (Account a : accounts) {
+					for (Account a : accounts.values()) {
 						System.out.println(a.getId() + "\t\t|\t" + a.getBalance());
 					}
 					System.out.println(
@@ -40,14 +47,15 @@ public class AccountMenu implements Showable {
 				System.out.println("2)\tLogout");
 				System.out.println("9)\tExit");
 				System.out.print("What would you like to do: ");
-				choice = input(accounts);
+				choice = input(accounts.keySet());
 				log.info("chosen option currently is " + choice);
 			}
-
+			Account a;
 			switch (choice) {
 			case 0:
-				int id = createAccount();
-				result = getAccount(id).show();
+				a = createAccount();
+				accounts.put(a.getId(), a);
+				result = a.show();
 				break;
 			case 1:
 				result = "main";
@@ -61,7 +69,8 @@ public class AccountMenu implements Showable {
 				result = "exit";
 				break;
 			default:
-				Account a = getAccount(choice);
+				// accounts is a hashmap of account id to accounts
+				a = accounts.get(choice);
 				if (a == null) {
 					log.error(
 							"In account menu, chosen option was not 0, 1, 2, 9, or an account held by the user but got to case switch");
@@ -69,17 +78,17 @@ public class AccountMenu implements Showable {
 					result = "account";
 				} else {
 					result = a.show();
-					log.info("result in acount menu = "+result);
+					log.info("result in acount menu = " + result);
 				}
 			}
 
 		} while (result == "account");
-		log.info("outside while loop of account menu. result = "+result);
+		log.info("outside while loop of account menu. result = " + result);
 		return result;
 
 	}
 
-	private int input(List<Account> account) {
+	private int input(Set<Integer> account) {
 		Scanner s = new Scanner(System.in);
 		int result;
 		try {
@@ -90,13 +99,8 @@ public class AccountMenu implements Showable {
 		} finally {
 			s.nextLine();
 		}
-		Set<Integer> id = new HashSet<>();
-		if (!account.isEmpty()) {
-			for (Account a : account)
-				id.add(a.getId());
-		}
 		if (result != 0 && result != 1 && result != 2 && result != 9) {
-			if (!id.isEmpty() && !id.contains(result)) {
+			if (account.isEmpty() || !account.contains(result)) {
 				System.out.println("\nThat is not a valid selection. Please choose from the menu provided.\n");
 				return -1;
 			}
@@ -109,36 +113,57 @@ public class AccountMenu implements Showable {
 	 * } }
 	 */
 
-	private List<Account> listAccounts() {
-		List<Account> accounts = new ArrayList<>();
+	private Map<Integer, Account> listAccounts() {
+		// List<Account> accounts = new ArrayList<>();
 		// TODO: get account id list that belong to current user
 		String email = controller.getUser();
-		List<Integer> id = new ArrayList<>();
-		id.add(10);
-		id.add(12);
-		id.add(15);
-		for (Integer i : id) {
-			accounts.add(getAccount(i.intValue()));
+		List<ResultSet> id = QueryStatement.getAccounts(email);
+		try {
+			for (ResultSet r : id) {
+				r.next();
+				accounts.put(r.getInt("id"),
+						getAccount(r.getInt("id"), r.getString("account_type"), r.getBigDecimal("balance")));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return accounts;
 	}
 
-	private Account getAccount(int id) {
-		// TODO go to psql and get account from id
-		String tempType = "checkings";
-		BigDecimal tempBalance = new BigDecimal("100.00");
-		Account result = new Account(id, tempType, tempBalance, this.controller);
+	private Account getAccount(int id, String type, BigDecimal balance) {
+		Account result = new Account(id, type, balance, this.controller);
 		return result;
 	}
 
 	/*
 	 * creates an account and returns the account id number
 	 */
-	private int createAccount() {
+	private Account createAccount() {
 		int id = 0;
 		// TODO: got to database and add account
-		//dont forget to add the number of people on the account
-		return id;
+		// dont forget to add the number of people on the account
+		String type = checkAccountType();
+		log.info("Account type user wants to open: "+type);
+		BigDecimal balance = new BigDecimal("0");
+		id = QueryStatement.insertAccount(balance, type, 1, controller.getUser());
+		Account result = getAccount(id, type, balance);
+		return result;
+	}
+
+	private String checkAccountType() {
+		String result;
+		Scanner s = new Scanner(System.in);
+		do {
+			System.out.print("Do you want to open a savings or checkings account? ");
+			result = s.nextLine();
+			log.debug("account type got from user: "+result);
+			result = result.trim();
+			if (!result.equalsIgnoreCase("checkings") && !result.equalsIgnoreCase("savings")) {
+				System.out.println("That is not a valid accout type. Please try again.");
+			}
+		} while (!result.equalsIgnoreCase("checkings") && !result.equalsIgnoreCase("savings"));
+		return result;
 	}
 
 	/*
@@ -149,9 +174,10 @@ public class AccountMenu implements Showable {
 		private int id;
 		private String type;
 		private BigDecimal balance;
-		
+
 		private Controller controller;
-		//in the data table, be sure the keep track of the number of people who are on the account and manually delete accounts.
+		// in the data table, be sure the keep track of the number of people who are on
+		// the account and manually delete accounts.
 
 		public Account(int id, String type, BigDecimal balance, Controller c) {
 			super();
@@ -245,8 +271,8 @@ public class AccountMenu implements Showable {
 				s.nextLine();
 				return -1;
 			}
-			if (result != 0 && result != 1 && result != 2 && result != 3 && result != 4 && result != 5 &&
-					result != 6 && result != 9) {
+			if (result != 0 && result != 1 && result != 2 && result != 3 && result != 4 && result != 5 && result != 6
+					&& result != 9) {
 				System.out.println("\nThat is not a valid selection. Please choose from the given menu.\n");
 				s.nextLine();
 				return -1;
@@ -260,7 +286,7 @@ public class AccountMenu implements Showable {
 			// double add, int to_id should be scanned in here and checked
 			// also needs a way to go back to the accounts menu
 			BigDecimal amount = new BigDecimal("-1");
-			while(amount.compareTo(new BigDecimal("-1")) == -1) {
+			while (amount.compareTo(new BigDecimal("-1")) == -1) {
 				amount = checkAmount();
 			}
 			if (balance.compareTo(amount) == -1) {// if balance is less than given bigint
@@ -291,6 +317,7 @@ public class AccountMenu implements Showable {
 			}
 		}
 
+		//returns true if yes was input to scanner and false if no was input
 		private boolean yesOrNo() {
 			Scanner s = new Scanner(System.in);
 			String input = s.nextLine();
@@ -306,11 +333,14 @@ public class AccountMenu implements Showable {
 		}
 
 		private void widthdrawMoney() {
-			System.out.print("How much money would you like to widthdraw? ");
 			BigDecimal amount = new BigDecimal("-1");
-			while (amount.compareTo(new BigDecimal("-1")) == 0) {
+			do {
+				System.out.print("How much money would you like to widthdraw? ");
 				amount = checkAmount();
-			}
+				if(amount.equals(new BigDecimal("-1"))) {
+					System.out.println("That is not a valid amount. Please try again.");
+				}
+			} while (amount.compareTo(new BigDecimal("-1")) == 0);
 			if (balance.compareTo(amount) == -1) {
 				System.out.println("You do not have enough in this account to widthdraw that amount.");
 				return;
@@ -322,13 +352,15 @@ public class AccountMenu implements Showable {
 		}
 
 		private void depositMoney() {
-			System.out.print("How much money would you like to deposit? ");
 			BigDecimal amount = new BigDecimal("-1");
-			while (amount.compareTo(new BigDecimal("-1")) == 0) {
+			do {
+				System.out.print("How much money would you like to deposit? ");
 				amount = checkAmount();
-			}
+			} while (amount.compareTo(new BigDecimal("-1")) == 0);
 			// TODO: change database amount
-			balance = balance.add(amount);
+			boolean success = QueryStatement.deposit(this.getId(), amount);
+			if(success)
+				balance = balance.add(amount);
 		}
 
 		private BigDecimal checkAmount() {
@@ -339,8 +371,9 @@ public class AccountMenu implements Showable {
 			} catch (NumberFormatException e) {
 				System.out.println("Please enter a valid dollar amount.");
 				return new BigDecimal("-1");
+			} finally {
+				s.nextLine();
 			}
-			s.nextLine();
 			return result;
 		}
 	}

@@ -8,8 +8,8 @@ import com.revature.dao.QueryStatement;
 
 public class ExecuteProgram {
 	public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeySpecException {
-		//Controller program = new Controller();
-		//program.run();
+		Controller program = new Controller();
+		program.run();
 		//WelcomeMenu m = new WelcomeMenu();
 		//m.show();
 		//MainMenu mm = new MainMenu();
@@ -21,6 +21,6 @@ public class ExecuteProgram {
 		//String hash = BCrypt.hashpw("password", salt);
 		//QueryStatement.insertUser("user@gmail.com", hash, salt, "8583817405", "Kyne", "Liu", "address", new Date(2, 5, 1992));
 		
-		QueryStatement.insertAccount(new BigDecimal("100.50"), "checkings", 1, "user@gmail.com");
+		//System.out.println(QueryStatement.getAccounts("user@gmail.com"));
 	}
 }
