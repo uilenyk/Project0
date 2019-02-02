@@ -28,8 +28,8 @@ public class AccountMenu implements Showable {
 
 	public String show() {
 		String result = "account";
-		listAccounts();
 		do {
+			listAccounts();
 			int choice = -1;
 			while (choice == -1) {
 				if (accounts.isEmpty()) {
@@ -144,7 +144,7 @@ public class AccountMenu implements Showable {
 		// TODO: got to database and add account
 		// dont forget to add the number of people on the account
 		String type = checkAccountType();
-		log.info("Account type user wants to open: "+type);
+		log.info("Account type user wants to open: " + type);
 		BigDecimal balance = new BigDecimal("0");
 		id = QueryStatement.insertAccount(balance, type, 1, controller.getUser());
 		Account result = getAccount(id, type, balance);
@@ -157,7 +157,7 @@ public class AccountMenu implements Showable {
 		do {
 			System.out.print("Do you want to open a savings or checkings account? ");
 			result = s.nextLine();
-			log.debug("account type got from user: "+result);
+			log.debug("account type got from user: " + result);
 			result = result.trim();
 			if (!result.equalsIgnoreCase("checkings") && !result.equalsIgnoreCase("savings")) {
 				System.out.println("That is not a valid accout type. Please try again.");
@@ -200,10 +200,9 @@ public class AccountMenu implements Showable {
 									+ "transfer money to)");
 					System.out.println("1)\tMake a widthdraw.");
 					System.out.println("2)\tMake a deposit");
-					System.out.println("3)\tClose this account. (The balance must be 0 for the account to be closed)");
-					System.out.println("4)\tGo back to the accounts menu.");
-					System.out.println("5)\tGo back to the main menu.");
-					System.out.println("6)\tLogout");
+					System.out.println("3)\tGo back to the accounts menu.");
+					System.out.println("4)\tGo back to the main menu.");
+					System.out.println("5)\tLogout");
 					System.out.println("9)\tExit");
 					System.out.print("What would you like to do: ");
 					choice = input();
@@ -220,17 +219,10 @@ public class AccountMenu implements Showable {
 					depositMoney();
 					break;
 				case 3:
-					// account is
-					if (closeAccount()) {
-						return "account";
-					} else {
-						break;
-					}
-				case 4:
 					return "account";
-				case 5:
+				case 4:
 					return "main";
-				case 6:
+				case 5:
 					return "welcome";
 				case 9:
 					return "exit";
@@ -283,53 +275,43 @@ public class AccountMenu implements Showable {
 		}
 
 		private synchronized void transferBalance() {
-			// double add, int to_id should be scanned in here and checked
-			// also needs a way to go back to the accounts menu
-			BigDecimal amount = new BigDecimal("-1");
-			while (amount.compareTo(new BigDecimal("-1")) == -1) {
-				amount = checkAmount();
+			System.out.print("Enter the account number of the account you want to transfer to: ");
+			Scanner s = new Scanner(System.in);
+			int account;
+			do {//checks for valid account id  input
+				try {
+					account = s.nextInt();
+				} catch (InputMismatchException e) {
+					System.out.println("\nThat is not a valid selection. Please enter a number.\n");
+					s.nextLine();
+					account = -1;
+				}
+				if(account < 100) {
+					System.out.println("\nThat is not a valid selection. Please enter a number.\n");
+					s.nextLine();
+					account = -1;
+				}
+			}while(account == -1);
+			if(!QueryStatement.checkAccount(account)) {//checks if the account id exists
+				System.out.println("That account does not exist.");
+				return;
 			}
+			BigDecimal amount;
+			do {
+				System.out.print("How much money would you like to transfer? ");
+				amount = checkAmount();
+				if (amount.equals(new BigDecimal("-1"))) {
+					System.out.println("That is not a valid amount. Please try again.");
+				}
+			} while (amount.compareTo(new BigDecimal("-1")) == 0);
+			
 			if (balance.compareTo(amount) == -1) {// if balance is less than given bigint
 				System.out.println("The selected account does not have the funds to send that amount.");
 				return;
 			}
 			// TODO: go make the change on the database here
-			this.balance.subtract(amount);
-		}
-
-		/*
-		 * returns true if account was successfully clsoed and false if the account is
-		 * still open
-		 */
-		private boolean closeAccount() {
-			if (balance.compareTo(new BigDecimal("0")) != 0) {
-				System.out.println("You cannot close this account because there is still money on this account");
-				return false;
-			}
-			// Scanner s = new Scanner(System.in);
-			System.out.print("Are you sure you want to close this account (yes/no)? ");
-			boolean close = yesOrNo();
-			if (close) {
-				// TODO: close account and delete account from tables
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		//returns true if yes was input to scanner and false if no was input
-		private boolean yesOrNo() {
-			Scanner s = new Scanner(System.in);
-			String input = s.nextLine();
-			// checks for a valid input
-			while (!input.equalsIgnoreCase("yes") && !input.equalsIgnoreCase("no")) {
-				System.out.print("Sorry, that was not a valid input.\nDo you have an existing account?(yes/no) ");
-				input = s.nextLine();
-			}
-			if (input.equalsIgnoreCase("yes"))
-				return true;
-			else
-				return false;
+			QueryStatement.transfer(this.getId(), account, amount);
+			this.balance = this.balance.subtract(amount);
 		}
 
 		private void widthdrawMoney() {
@@ -337,7 +319,7 @@ public class AccountMenu implements Showable {
 			do {
 				System.out.print("How much money would you like to widthdraw? ");
 				amount = checkAmount();
-				if(amount.equals(new BigDecimal("-1"))) {
+				if (amount.equals(new BigDecimal("-1"))) {
 					System.out.println("That is not a valid amount. Please try again.");
 				}
 			} while (amount.compareTo(new BigDecimal("-1")) == 0);
@@ -346,6 +328,7 @@ public class AccountMenu implements Showable {
 				return;
 			} else {
 				// TODO: change database amount
+				QueryStatement.widthdraw(this.getId(), amount);
 				balance = balance.subtract(amount);
 				return;
 			}
@@ -359,7 +342,7 @@ public class AccountMenu implements Showable {
 			} while (amount.compareTo(new BigDecimal("-1")) == 0);
 			// TODO: change database amount
 			boolean success = QueryStatement.deposit(this.getId(), amount);
-			if(success)
+			if (success)
 				balance = balance.add(amount);
 		}
 

@@ -191,13 +191,8 @@ public class WelcomeMenu implements Showable {
 			System.out.println("That is not a valid US phone number.");
 			System.out.print("Pleae enter your phone number (please enter the number without dashes or parentheses): ");
 		}
-
 		// TODO: create new row and save all data to db
-		// checks for a valid email patter to be entered
-		while (user.length() > 64 || !validEmail(user)) {
-			System.out.print("That is not a valid email address.\nPlease enter your email: ");
-			user = s.nextLine();
-		}
+		QueryStatement.insertUser(user, hash, salt, number, firstName, lastName, address);
 		controller.setUser(user);
 		return "main";
 	}
@@ -258,18 +253,17 @@ public class WelcomeMenu implements Showable {
 		boolean valid;
 		Scanner s = new Scanner(System.in);
 		do {
-			System.out.print("Enter your password: ");
+			System.out.print("Enter your email address: ");
 			email = s.nextLine();
 			if (!validEmail(email)) {
 				System.out.println("That is not a valid email.");
 				valid = false;
-			} else {/* if (check if email is in database) */
-				// System.out.println("This email is already in use. Please login or use another
-				// email");
-				// return "login";
+			} else if (QueryStatement.userExists(email)) {
+				System.out.println("This email is already in use. Please login or use another email");
+				return "login";
+			} else 
 				valid = true;
-			}
-		} while (valid);
+		} while (!valid);
 		return email;
 	}
 

@@ -1,10 +1,14 @@
 package com.revature;
 
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
+
+import com.revature.dao.QueryStatement;
 
 public class PersonalMenu implements Showable {
 	static Logger log = Logger.getRootLogger();
@@ -15,7 +19,6 @@ public class PersonalMenu implements Showable {
 	private String email;
 	private String address;
 	private String phone;
-	private Date birthday;
 
 	public PersonalMenu(Controller c) {
 		controller = c;
@@ -32,7 +35,7 @@ public class PersonalMenu implements Showable {
 			while (choice == -1) {
 				System.out.println("Your personal info:");
 				System.out.println("Name: " + name + "\t|\tEmail: " + email + "\nMailing Address: " + address
-						+ "\nPhone Number: " + phone + "\t|\tBirthday: " + birthday);
+						+ "\nPhone Number: " + phone);
 				System.out.println("0)\tEdit mailing address.");
 				System.out.println("1)\tEdit phone number.");
 				System.out.println("2)\tBack to main menu.");
@@ -69,7 +72,6 @@ public class PersonalMenu implements Showable {
 
 
 	private void editPhoneNumber() {
-		// TODO Auto-generated method stub
 		//Scanner s = new Scanner(System.in);
 		System.out.print("What is your new phone number? (please enter the number without dashes or parentheses) ");
 		String number;
@@ -77,7 +79,7 @@ public class PersonalMenu implements Showable {
 			System.out.println("That is not a valid US phone number.");
 			System.out.print("What is your new phone number? (please enter the number without dashes or parentheses) ");
 		}
-		//TODO: change in psql
+		QueryStatement.updateNumber(controller.getUser(), number);
 		phone = number;
 		System.out.println("Your phone number has been successfully updated");
 	}
@@ -99,6 +101,11 @@ public class PersonalMenu implements Showable {
 		System.out.print("Enter your new mailing address: ");
 		//TODO: update on database
 		address = s.nextLine();
+		while(address.length() > 128){
+			System.out.print("That address is too long. Please try again: ");
+			address = s.nextLine();
+		}
+		QueryStatement.updateAddress(controller.getUser(), address);
 		System.out.println("Your address has been successfully updated.");
 	}
 
@@ -122,10 +129,17 @@ public class PersonalMenu implements Showable {
 
 	private void setUser(String user) {
 		// get user using email
-		name = "Temp Name";
+		ResultSet rs = QueryStatement.getUser(user);
+		try {
+			if(rs.next()) {
+				name = rs.getString("first_name")+ " "+rs.getString("last_name");
+				address = rs.getString("address");
+				phone = rs.getString("phone_number");
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+			return;
+		}
 		email = user;
-		address = "Temp Address";
-		phone = "8583817405";
-		birthday = new Date(1992, 5, 2);
 	}
 }
