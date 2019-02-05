@@ -2,13 +2,14 @@ package com.revature.dao;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class QueryStatement {
 
@@ -113,7 +114,7 @@ public class QueryStatement {
 		return false;
 	}
 	
-	public static List<ResultSet> getAccounts(String user) {
+	public static List<Map<String, String>> getAccounts(String user) {
 		try(Connection conn = DriverManager.getConnection(System.getenv("psql_url"), System.getenv("psql_role"), System.getenv("psql_pass"))){
 			String query = "SELECT account FROM user_accounts WHERE user_id = ?;";
 			
@@ -122,22 +123,28 @@ public class QueryStatement {
 			statement.setString(1, user);
 			
 			ResultSet rs = statement.executeQuery();
-			List<ResultSet> account = new ArrayList<>();
+			List<Map<String, String>> account = new ArrayList<>();
 			while(rs.next()) {
 				query = "SELECT * FROM accounts WHERE id = ?";
 				statement = conn.prepareStatement(query);
 				statement.setInt(1, rs.getInt("account"));
 				ResultSet result = statement.executeQuery();
-				account.add(result);
+				if(result.next()) {
+					Map<String, String> a = new HashMap<>();
+					a.put("id", String.valueOf(result.getInt("id")));
+					a.put("balance", String.valueOf(result.getBigDecimal("balance")));
+					a.put("type", result.getString("account_type"));
+					account.add(a);
+				}
 			}
 			return account;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return new ArrayList<ResultSet>();
+		return new ArrayList<Map<String, String>>();
 	}
 	
-	public static ResultSet getHash(String user) {
+	public static Map<String, String> getHash(String user) {
 		try(Connection conn = DriverManager.getConnection(System.getenv("psql_url"), System.getenv("psql_role"), System.getenv("psql_pass"))){
 			String query = "SELECT passhash, salt FROM users WHERE email = ?";
 			
@@ -145,7 +152,12 @@ public class QueryStatement {
 			
 			statement.setString(1, user);
 			ResultSet rs = statement.executeQuery();
-			return rs;
+			Map<String, String> result = new HashMap<>();
+			if (rs.next()) {
+				result.put("hash", rs.getString("passhash"));
+				result.put("salt", rs.getString("salt"));
+			}
+			return result;
 		}catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -237,12 +249,19 @@ public class QueryStatement {
 			return false;
 		}
 	}
-	public static ResultSet getUser(String user) {
+	public static Map<String, String> getUser(String user) {
 		try (Connection conn = DriverManager.getConnection(System.getenv("psql_url"), System.getenv("psql_role"), System.getenv("psql_pass"))){
 			String query = "SELECT first_name, last_name, email, address, phone_number FROM users WHERE email = ?;";
 			PreparedStatement statement = conn.prepareStatement(query);
 			statement.setString(1, user);
-			return statement.executeQuery();
+			ResultSet rs = statement.executeQuery();
+			Map<String, String> result = new HashMap<>();
+			if(rs.next()) {
+				result.put("name", rs.getString("first_name")+ " "+rs.getString("last_name"));
+				result.put("address", rs.getString("address"));
+				result.put("phone", rs.getString("phone_number"));
+			}
+			return result;
 		} catch(SQLException e) {
 			e.printStackTrace();
 			return null;

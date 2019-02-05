@@ -4,9 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -139,22 +138,9 @@ public class WelcomeMenu implements Showable {
 		if (!validEmail(user))
 			return false;
 		// TO DO: go to data base to get salt and hashed password
-		String hash = null;
-		String salt = null;
-		ResultSet rs = QueryStatement.getHash(user);
-		try {
-			if (rs.next()) {
-				hash = rs.getString("passhash");
-				salt = rs.getString("salt");
-			}
-			else {
-				return false;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		String password = BCrypt.hashpw(pass, salt);
-		if (hash.equals(password))
+		Map<String, String> result = QueryStatement.getHash(user);
+		String password = BCrypt.hashpw(pass, result.get("salt"));
+		if (result.get("hash").equals(password))
 			return true;
 		else
 			return false;
@@ -261,7 +247,7 @@ public class WelcomeMenu implements Showable {
 			} else if (QueryStatement.userExists(email)) {
 				System.out.println("This email is already in use. Please login or use another email");
 				return "login";
-			} else 
+			} else
 				valid = true;
 		} while (!valid);
 		return email;

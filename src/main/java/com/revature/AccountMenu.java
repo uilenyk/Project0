@@ -1,10 +1,7 @@
 package com.revature;
 
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +32,9 @@ public class AccountMenu implements Showable {
 				if (accounts.isEmpty()) {
 					System.out.println("You currently have no open accounts.");
 				} else {
-					System.out.println("Accounts #\t|\tBalance");
+					System.out.println("Accounts #\t|\tBalance\t|\tType");
 					for (Account a : accounts.values()) {
-						System.out.println(a.getId() + "\t\t|\t" + a.getBalance());
+						System.out.println(a.getId() + "\t\t|\t" + a.getBalance() + "\t|\t" + a.getType());
 					}
 					System.out.println(
 							"Enter the account number of the account you want to access or an option from below:");
@@ -117,16 +114,10 @@ public class AccountMenu implements Showable {
 		// List<Account> accounts = new ArrayList<>();
 		// TODO: get account id list that belong to current user
 		String email = controller.getUser();
-		List<ResultSet> id = QueryStatement.getAccounts(email);
-		try {
-			for (ResultSet r : id) {
-				r.next();
-				accounts.put(r.getInt("id"),
-						getAccount(r.getInt("id"), r.getString("account_type"), r.getBigDecimal("balance")));
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
+		List<Map<String, String>> id = QueryStatement.getAccounts(email);
+		for (Map<String, String> r : id) {
+			accounts.put(Integer.parseInt(r.get("id")),
+					getAccount(Integer.parseInt(r.get("id")), r.get("type"), new BigDecimal(r.get("balance"))));
 		}
 		return accounts;
 	}
@@ -278,7 +269,7 @@ public class AccountMenu implements Showable {
 			System.out.print("Enter the account number of the account you want to transfer to: ");
 			Scanner s = new Scanner(System.in);
 			int account;
-			do {//checks for valid account id  input
+			do {// checks for valid account id input
 				try {
 					account = s.nextInt();
 				} catch (InputMismatchException e) {
@@ -286,13 +277,13 @@ public class AccountMenu implements Showable {
 					s.nextLine();
 					account = -1;
 				}
-				if(account < 100) {
+				if (account < 100) {
 					System.out.println("\nThat is not a valid selection. Please enter a number.\n");
 					s.nextLine();
 					account = -1;
 				}
-			}while(account == -1);
-			if(!QueryStatement.checkAccount(account)) {//checks if the account id exists
+			} while (account == -1);
+			if (!QueryStatement.checkAccount(account)) {// checks if the account id exists
 				System.out.println("That account does not exist.");
 				return;
 			}
@@ -304,7 +295,7 @@ public class AccountMenu implements Showable {
 					System.out.println("That is not a valid amount. Please try again.");
 				}
 			} while (amount.compareTo(new BigDecimal("-1")) == 0);
-			
+
 			if (balance.compareTo(amount) == -1) {// if balance is less than given bigint
 				System.out.println("The selected account does not have the funds to send that amount.");
 				return;

@@ -1,9 +1,8 @@
 package com.revature;
 
-import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.InputMismatchException;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
@@ -12,7 +11,7 @@ import com.revature.dao.QueryStatement;
 
 public class PersonalMenu implements Showable {
 	static Logger log = Logger.getRootLogger();
-	
+
 	private Controller controller;
 
 	private String name;
@@ -44,8 +43,8 @@ public class PersonalMenu implements Showable {
 				System.out.print("What do you want to do? ");
 				choice = input();
 			}
-			
-			switch(choice) {
+
+			switch (choice) {
 			case 0:
 				editMailingAddress();
 				break;
@@ -69,13 +68,11 @@ public class PersonalMenu implements Showable {
 		return null;
 	}
 
-
-
 	private void editPhoneNumber() {
-		//Scanner s = new Scanner(System.in);
+		// Scanner s = new Scanner(System.in);
 		System.out.print("What is your new phone number? (please enter the number without dashes or parentheses) ");
 		String number;
-		while((number = checkPhoneInput()) == "false") {
+		while ((number = checkPhoneInput()) == "false") {
 			System.out.println("That is not a valid US phone number.");
 			System.out.print("What is your new phone number? (please enter the number without dashes or parentheses) ");
 		}
@@ -83,13 +80,13 @@ public class PersonalMenu implements Showable {
 		phone = number;
 		System.out.println("Your phone number has been successfully updated");
 	}
-	
-	//Makes sure the new phone number input is a possible valid number
+
+	// Makes sure the new phone number input is a possible valid number
 	private String checkPhoneInput() {
 		Scanner s = new Scanner(System.in);
 		String number = s.next();
 		s.nextLine();
-		if(number.matches("[0-9]+") && number.length() == 10) {
+		if (number.matches("[0-9]+") && number.length() == 10) {
 			return number;
 		} else {
 			return "false";
@@ -99,9 +96,9 @@ public class PersonalMenu implements Showable {
 	private void editMailingAddress() {
 		Scanner s = new Scanner(System.in);
 		System.out.print("Enter your new mailing address: ");
-		//TODO: update on database
+		// TODO: update on database
 		address = s.nextLine();
-		while(address.length() > 128){
+		while (address.length() > 128) {
 			System.out.print("That address is too long. Please try again: ");
 			address = s.nextLine();
 		}
@@ -129,17 +126,10 @@ public class PersonalMenu implements Showable {
 
 	private void setUser(String user) {
 		// get user using email
-		ResultSet rs = QueryStatement.getUser(user);
-		try {
-			if(rs.next()) {
-				name = rs.getString("first_name")+ " "+rs.getString("last_name");
-				address = rs.getString("address");
-				phone = rs.getString("phone_number");
-			}
-		} catch(SQLException e) {
-			e.printStackTrace();
-			return;
-		}
+		Map<String, String> u = QueryStatement.getUser(user);
+		name = u.get("name");
+		address = u.get("address");
+		phone = u.get("phone");
 		email = user;
 	}
 }

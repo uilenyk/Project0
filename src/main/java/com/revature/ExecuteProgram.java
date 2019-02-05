@@ -1,10 +1,7 @@
 package com.revature;
 
-import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-
-import com.revature.dao.QueryStatement;
 
 public class ExecuteProgram {
 	public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeySpecException {
