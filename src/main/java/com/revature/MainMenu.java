@@ -15,6 +15,7 @@ public final class MainMenu implements Showable{
 	}
 	
 	public String show() {
+		System.out.println("\nMAIN MENU");
 		int choice = -1;
 		while(choice == -1) {
 			System.out.println("0)\tAccounts");

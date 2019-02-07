@@ -14,9 +14,6 @@ import java.util.Map;
 public class QueryStatement {
 
 	public static boolean insertUser(String user, String hash, String salt, String number, String first, String last, String address) {
-		System.out.println("url = "+System.getenv("psql_url"));
-		System.out.println("role = "+System.getenv("psql_role"));
-		System.out.println("pass = "+System.getenv("psql_pass"));
 		try(Connection conn = DriverManager.getConnection(System.getenv("psql_url"), System.getenv("psql_role"), System.getenv("psql_pass"))) {
 			String query = "INSERT INTO users (email, first_name, last_name, passhash, salt, phone_number, address)"
 					+ " VALUES (?, ?, ?, ?, ?, ?, ?);";
@@ -31,6 +28,7 @@ public class QueryStatement {
 			statement.setString(7, address);
 			
 			statement.executeUpdate();
+			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -39,9 +37,6 @@ public class QueryStatement {
 	}
 	
 	public static int insertAccount(BigDecimal balance, String account_type, int account_members, String user) {
-		System.out.println("url = "+System.getenv("psql_url"));
-		System.out.println("role = "+System.getenv("psql_role"));
-		System.out.println("pass = "+System.getenv("psql_pass"));
 		int account_id = 0;
 		try(Connection conn = DriverManager.getConnection(System.getenv("psql_url"), System.getenv("psql_role"), System.getenv("psql_pass"))) {
 			String query = "INSERT INTO accounts(balance, account_type, account_members) VALUES (?, ?, ?) RETURNING id;";
@@ -65,6 +60,7 @@ public class QueryStatement {
 			statement.setInt(2, account_id);
 			
 			statement.executeUpdate();
+			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return account_id;
@@ -84,6 +80,7 @@ public class QueryStatement {
 			
 			if(rs.next()) {
 				System.out.println("user = "+rs.getString("email"));
+				conn.close();
 				return true;
 			}
 		} catch (SQLException e) {
@@ -105,6 +102,7 @@ public class QueryStatement {
 			
 			if(rs.next()) {
 				System.out.println("user = "+rs.getString("id"));
+				conn.close();
 				return true;
 			}
 		} catch (SQLException e) {
@@ -137,10 +135,11 @@ public class QueryStatement {
 					account.add(a);
 				}
 			}
+			conn.close();
 			return account;
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		} 
 		return new ArrayList<Map<String, String>>();
 	}
 	
@@ -157,6 +156,7 @@ public class QueryStatement {
 				result.put("hash", rs.getString("passhash"));
 				result.put("salt", rs.getString("salt"));
 			}
+			conn.close();
 			return result;
 		}catch (SQLException e) {
 			e.printStackTrace();
@@ -180,6 +180,7 @@ public class QueryStatement {
 			statement.setBigDecimal(1, newBalance);
 			statement.setInt(2, id);
 			statement.executeUpdate();
+			conn.close();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -204,6 +205,7 @@ public class QueryStatement {
 			statement.setBigDecimal(1, newBalance);
 			statement.setInt(2, id);
 			statement.executeUpdate();
+			conn.close();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -243,6 +245,7 @@ public class QueryStatement {
 			toStatement.setInt(2, to);
 			fromStatement.executeUpdate();
 			toStatement.executeUpdate();
+			conn.close();
 			return true;
 		} catch(SQLException e) {
 			e.printStackTrace();
@@ -261,6 +264,7 @@ public class QueryStatement {
 				result.put("address", rs.getString("address"));
 				result.put("phone", rs.getString("phone_number"));
 			}
+			conn.close();
 			return result;
 		} catch(SQLException e) {
 			e.printStackTrace();
@@ -275,6 +279,7 @@ public class QueryStatement {
 			statement.setString(1, number);
 			statement.setString(2, user);
 			statement.executeUpdate();
+			conn.close();
 			return true;
 		} catch(SQLException e) {
 			e.printStackTrace();
@@ -289,6 +294,7 @@ public class QueryStatement {
 			statement.setString(1, address);
 			statement.setString(2, user);
 			statement.executeUpdate();
+			conn.close();
 			return true;
 		} catch(SQLException e) {
 			e.printStackTrace();

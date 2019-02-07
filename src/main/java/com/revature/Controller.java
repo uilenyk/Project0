@@ -12,29 +12,26 @@ public class Controller {
 	
 	private String currentUser;
 	
-	public Controller() {
-		wm = new WelcomeMenu(this);
-		mm = new MainMenu(this);
-		am = new AccountMenu(this);
-		pm = new PersonalMenu(this);
-	}
-	
 	public void run() {
 		
 		String run = "welcome";
 		while (!run.equalsIgnoreCase("exit")) {
 			switch (run) {
 			case "welcome":
+				wm = new WelcomeMenu(this);
 				run = wm.show();
 				break;
 			case "main":
+				mm = new MainMenu(this);
 				run = mm.show();
 				break;
 			case "account":
+				am = new AccountMenu(this);
 				run = am.show();
 				log.info("run in controller = "+run);
 				break;
 			case "personal":
+				pm = new PersonalMenu(this);
 				run = pm.show();
 				break;
 			}

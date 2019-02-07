@@ -26,6 +26,7 @@ public class PersonalMenu implements Showable {
 
 	@Override
 	public String show() {
+		System.out.println("\nPERSONAL MENU");
 		// TODO Auto-generated method stub
 		String result = "personal";
 		this.setUser(controller.getUser());
@@ -70,11 +71,11 @@ public class PersonalMenu implements Showable {
 
 	private void editPhoneNumber() {
 		// Scanner s = new Scanner(System.in);
-		System.out.print("What is your new phone number? (please enter the number without dashes or parentheses) ");
+		System.out.print("What is your new phone number?\n(please enter the number without dashes or parentheses): ");
 		String number;
 		while ((number = checkPhoneInput()) == "false") {
 			System.out.println("That is not a valid US phone number.");
-			System.out.print("What is your new phone number? (please enter the number without dashes or parentheses) ");
+			System.out.print("What is your new phone number?\n(please enter the number without dashes or parentheses): ");
 		}
 		QueryStatement.updateNumber(controller.getUser(), number);
 		phone = number;

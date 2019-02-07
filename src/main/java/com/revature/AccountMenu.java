@@ -24,6 +24,7 @@ public class AccountMenu implements Showable {
 	}
 
 	public String show() {
+		System.out.println("\nACCOUNTS MENU");
 		String result = "account";
 		do {
 			listAccounts();

@@ -52,7 +52,7 @@ public class WelcomeMenu implements Showable {
 	 * @see com.revature.Showable#show()
 	 */
 	public String show() {
-		System.out.print("Welcome to the bank. Do you have an existing account?(yes/no) ");
+		System.out.print("\nWelcome to the bank.\nDo you have an existing account?(yes/no) ");
 		boolean input = haveAccount();
 		if (input) {
 			return login();
@@ -171,11 +171,11 @@ public class WelcomeMenu implements Showable {
 		// s.nextLine();
 		System.out.print("Please enter your mailing address: ");
 		String address = s.nextLine();
-		System.out.print("Please enter your phone number (please enter the number without dashes or parentheses): ");
+		System.out.print("Please enter your phone number\n(please enter the number without dashes or parentheses): ");
 		String number;
 		while ((number = checkPhoneInput()) == "false") {
 			System.out.println("That is not a valid US phone number.");
-			System.out.print("Pleae enter your phone number (please enter the number without dashes or parentheses): ");
+			System.out.print("Pleae enter your phone number\n(please enter the number without dashes or parentheses): ");
 		}
 		// TODO: create new row and save all data to db
 		QueryStatement.insertUser(user, hash, salt, number, firstName, lastName, address);
@@ -200,7 +200,7 @@ public class WelcomeMenu implements Showable {
 		boolean match;
 		do {
 			System.out.println(
-					"The password must be at least 8 characters long and contain one number, one lowercase letter, and one"
+					"The password must be at least 9 characters long and contain one\nnumber, one lowercase letter, and one"
 							+ " uppercase letter.");
 			do {
 				System.out.print("Please enter your password: ");
